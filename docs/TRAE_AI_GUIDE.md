@@ -1,8 +1,9 @@
-# Trae AI 开发使用说明书
+# AI 开发使用说明书
 
-> 适用项目：prism-umd-template  
-> 适用工具：Trae IDE（AI 辅助开发）  
-> 版本：1.0.0 · 2026-05-28
+> 适用项目：prism-umd-template
+> 版本：1.1.0 · 2026-05-28
+>
+> **注意**：本文档中的核心规则（第 3 节）、提示词模板（第 5 节）、禁止行为（第 7 节）、验收清单（第 8 节）、常见错误（第 9 节）已整合进 `rules/CLAUDE.md`，作为所有 AI 工具的统一规范。如果你在使用支持自动加载规则文件的 AI 工具（如 Claude Code），直接使用 `rules/CLAUDE.md` 即可；对于其他工具，可手动导入本文档或 `rules/CLAUDE.md`。
 
 ---
 
@@ -48,40 +49,27 @@
 
 ---
 
-## 2. Trae 项目配置
+## 2. AI 工具配置
 
-### 2.1 打开项目
+### 向 AI 工具导入规范文件
 
-在 Trae 中打开 `E:\Dashboard\prism-umd-template` 目录。
-
-### 2.2 配置 AI 上下文
-
-在 Trae 的 **项目设置 → AI 上下文** 中，将以下文件加入 AI 的**持久上下文**（每次对话自动载入）：
+使用任意 AI 工具时，建议手动导入以下文件作为上下文：
 
 | 优先级 | 文件路径 | 用途 |
 |--------|------|------|
-| ★★★ | `doc/TRAE_AI_GUIDE.md` | 本文件，AI 行为主规范 |
+| ★★★ | `rules/CLAUDE.md` | 完整 AI 开发规范（主文件） |
 | ★★★ | `src/build.ts` | 库入口，AI 理解导出结构 |
 | ★★★ | `src/build/types/manifest.ts` | 类型定义，AI 知道 Manifest 格式 |
-| ★★ | `doc/AI_CODING_STANDARDS.md` | 代码规范 |
 | ★★ | `tailwind.config.js` | AI 理解样式隔离配置 |
 | ★ | `src/build/components/ThemeSwitchTest.vue` | 标准组件示例 |
 
-### 2.3 创建 `.trae/rules.md` 规则文件
-
-在项目根目录创建 `.trae/rules.md`（Trae 会在每次 AI 对话时自动注入此文件）：
-
-```
-见下一节【3. Rules 规则文件】的完整内容
-```
+**Claude Code 用户**：`rules/CLAUDE.md` 会通过 `@rules/CLAUDE.md` 引用自动加载，无需手动导入。
 
 ---
 
-## 3. Rules 规则文件（核心）
+## 3. 规则文件（核心）
 
-在项目根目录创建 `.trae/rules.md`，内容如下（直接复制）：
-
----
+> 以下内容已整合进 `rules/CLAUDE.md`，此处保留以供参考。建议直接使用 `rules/CLAUDE.md` 作为主规范。
 
 ```markdown
 # prism-umd-template AI 开发规则

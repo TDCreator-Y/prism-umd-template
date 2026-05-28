@@ -57,37 +57,43 @@
  console.log(Object.keys(lib)) // ['default','install','KvcCard',...,'manifest']
  ```
  
- ## 组件级元信息（getManifest）
- 本项目各组件在内部通过 `defineExpose` 暴露了 `getManifest` 方法，可在运行时读取组件的名称、描述、版本、作者等：
+ ## 组件级元信息（manifest）
+ 本项目各组件在内部通过 `defineExpose({ manifest })` 暴露了 `manifest` 对象，可在运行时读取组件的名称、描述、版本、作者等：
  
  ```html
  <div id="app"></div>
  <script type="module">
    import { createApp, ref } from 'vue'
    // 假设通过 UMD 全局读取
-   const { RiskEvaluation } = window.VueComponent
+   const { ThemeSwitchTest } = window.VueComponent
  
    const App = {
-     template: '<RiskEvaluation ref="comp" />',
+     template: '<ThemeSwitchTest ref="comp" />',
      setup() {
        const comp = ref()
        setTimeout(() => {
-         // 组件挂载后读取暴露的 getManifest
-         console.log(comp.value.getManifest())
+         // 组件挂载后读取暴露的 manifest
+         console.log(comp.value.manifest)
        }, 0)
        return { comp }
      },
-     components: { RiskEvaluation }
+     components: { ThemeSwitchTest }
    }
  
    createApp(App).mount('#app')
  </script>
  ```
  
- 示例位置（部分）：
- - 风险评价模块：[src/build/components/RiskEvaluation/RiskEvaluation.vue](src/build/components/RiskEvaluation/RiskEvaluation.vue)
- - 商品归类模块：[src/build/components/ProductClassification/ProductClassification.vue](src/build/components/ProductClassification/ProductClassification.vue)
- - 原始记录识别模块：[src/build/components/RecordRecognition/RecordRecognition.vue](src/build/components/RecordRecognition/RecordRecognition.vue)
+ 每个组件内部的 manifest 结构：
+ ```typescript
+ {
+   name: string        // 组件名称
+   type: string        // 类型（如 'component'）
+   description: string // 组件描述
+   version: string     // 组件版本
+   author: string      // 组件作者
+ }
+ ```
  
  ## 库级清单（入口增强）
  为方便识别库内容，入口文件已增加 `manifest` 字段（位置：`src/build.ts`）：

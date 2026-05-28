@@ -14,11 +14,13 @@
 ├── src/
 │   ├── build/              # 组件库构建源码
 │   │   ├── components/     # 组件源码目录
+│   │   ├── composables/    # 组合式函数
 │   │   ├── types/          # 类型定义
-│   │   └── build.ts        # 库入口文件
-│   ├── dev/                # 开发环境源码（用于测试组件）
-│   └── uiHtml/             # 静态 HTML 演示文件
-├── build.ts                # 构建脚本
+│   │   └── utils/          # 工具函数（含 getBridge）
+│   ├── dev/                # 开发环境源码（用于测试组件，不打包）
+│   └── build.ts            # 库入口文件（withWrapper 注册 + manifest）
+├── rules/                  # AI 开发规范
+│   └── CLAUDE.md
 ├── vite.config.ts          # Vite 配置文件
 ├── tailwind.config.js      # Tailwind CSS 配置文件
 └── package.json            # 项目依赖与脚本
@@ -170,18 +172,22 @@ Tailwind 配置文件位于 `tailwind.config.js`。
 
 ### 5.2 外部依赖
 
-为了减小包体积，`vue` 被设置为外部依赖（external）。这意味着使用该组件库的项目必须在全局环境中提供 `Vue`。
+以下三个依赖设置为 `external`，不打包进 UMD，由宿主页面提供：
 
 ```typescript
 rollupOptions: {
-  external: ["vue"],
+  external: ['vue', 'echarts', '@kivii.com/bridge'],
   output: {
     globals: {
-      vue: "Vue",
+      vue: 'Vue',
+      echarts: 'echarts',
+      '@kivii.com/bridge': 'kivii',
     },
   },
 },
 ```
+
+宿主页面需要按需提供对应的全局变量（`Vue` 必须，`echarts` 和 `kivii` 按组件实际使用情况决定）。
 
 ### 5.3 样式处理
 
@@ -224,27 +230,20 @@ rollupOptions: {
 
 ### 7.1 构建插件
 
-#### `vite-plugin-css-injected-by-js` (当前使用)
+#### `plugins/vite-plugin-inline-css.ts`（当前使用）
 
-这是目前 `vite.config.ts` 中配置的插件。它负责在构建过程中提取 CSS 并将其注入到生成的 JS 文件中。
+项目使用位于 `plugins/` 目录下的本地自定义插件 `inlineCss`，在 `vite.config.ts` 中引入：
 
-#### `plugins/vite-plugin-inline-css.ts` (本地插件)
+```typescript
+import { inlineCss } from './plugins/vite-plugin-inline-css'
 
-项目目录 `plugins/` 下包含一个自定义插件 `inlineCss`。这是一个备选方案或参考实现，其功能与 `vite-plugin-css-injected-by-js` 类似，但提供了更底层的控制（如手动读取 CSS 文件并拼接字符串）。
+export default defineConfig({
+  plugins: [vue(), inlineCss()],
+  // ...
+})
+```
 
-**如果需要切换到本地插件：**
-
-1.  修改 `vite.config.ts`：
-
-    ```typescript
-    // import cssInjectedByJs from "vite-plugin-css-injected-by-js";
-    import { inlineCss } from './plugins/vite-plugin-inline-css'
-
-    export default defineConfig({
-    	plugins: [vue(), inlineCss()], // 替换 cssInjectedByJs()
-    	// ...
-    })
-    ```
+**工作原理**：构建完成后读取生成的 `style.css`，将 CSS 内容转换为 JS 字符串，注入到 UMD 文件中（运行时动态创建 `<style>` 标签插入 `<head>`），最后删除单独的 CSS 文件，输出单文件 UMD。
 
 ---
 
@@ -349,7 +348,7 @@ const manifest: Manifest = {
 
 ### 9.1 Tailwind 作用域配置
 
-文件: [tailwind.config.js](file:///Users/_suesusan/Downloads/kivii-component-template-main/tailwind.config.js)
+文件: `tailwind.config.js`
 
 ```javascript
 /** @type {import('tailwindcss').Config} */
@@ -372,7 +371,7 @@ export default {
 
 ### 9.2 高阶组件包裹 (HOC)
 
-文件: [build.ts](file:///Users/_suesusan/Downloads/kivii-component-template-main/src/build.ts)
+文件: `src/build.ts`
 
 ```ts
 import { h, defineComponent } from 'vue'

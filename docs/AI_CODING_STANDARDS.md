@@ -162,7 +162,16 @@ defineExpose({ manifest })
 
 ### 6.2 外部依赖处理
 
-- **Vue**: 保持为 `external`，不要打包进 UMD。
+以下三个依赖均配置为 `external`，不打包进 UMD，由宿主页面负责提供：
+
+| 依赖 | 全局变量 | 说明 |
+|------|----------|------|
+| `vue` | `Vue` | 宿主必须提供 Vue 3 |
+| `echarts` | `echarts` | 宿主可选加载 ECharts |
+| `@kivii.com/bridge` | `kivii` | 可选的平台 Bridge API |
+
+禁止引入任何其他会被打包进 UMD 的第三方库（如 axios、lodash、dayjs）。
+
 - **图标**: 使用 FontAwesome 类名（如 `fas fa-user`），假设宿主环境已加载 FontAwesome CSS。
 
 ---
@@ -225,17 +234,19 @@ rollupOptions: {
 
 ## 9. 数据请求规范 (Bridge)
 
-- 数据请求统一通过 `window.kivii.request` 进行，禁止在组件内直接使用 `fetch/axios` 等。
+- 数据请求统一通过 `getBridge()` 工具函数进行，禁止在组件内直接使用 `fetch`、`axios` 或 `window.kivii?.request`。
+- `getBridge()` 已封装了安全获取逻辑，调用前检查返回值即可。
 - 宿主环境需通过 CDN 注入 `window.kivii`（例如 `<script src=".../bridge.min.js"></script>`）。
-- 类型提示：全局类型已在 `env.d.ts` 声明。
-- 失败处理：调用前需判断 `window.kivii?.request` 是否存在并进行错误兜底。
 
 示例：
 
 ```ts
+import { getBridge } from '@/build/utils'
+
 async function fetchData() {
-	if (!window.kivii?.request) throw new Error('Bridge not available')
-	return window.kivii.request<{ ok: boolean }>({
+	const bridge = getBridge()
+	if (!bridge) return   // bridge 未初始化时安全退出
+	return bridge.request<{ ok: boolean }>({
 		url: '/api/example',
 		method: 'GET',
 	})
@@ -243,8 +254,6 @@ async function fetchData() {
 ```
 
 ## 附录：开发指南摘要
-
-以下内容摘自 `DEVELOPMENT_GUIDE.md`，作为快速参考。
 
 以下内容摘自 `DEVELOPMENT_GUIDE.md`，作为快速参考。
 

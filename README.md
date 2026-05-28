@@ -1,153 +1,68 @@
-# Dashboard LightWeight UMD Template
+# Prism UMD Template
 
-**A lightweight Vue 3 component library template that builds to a single UMD file — drop-in ready for any HTML page or low-code platform.**
-
-[中文文档](#中文说明) | [English](#english)
+[中文](#中文) | [English](#english)
 
 ---
 
-## English
+<a id="中文"></a>
 
-### What is this?
+# Vue 3 UMD 组件库模板
 
-This template helps you build **self-contained Vue 3 component libraries** that:
+基于 Vue 3 + Vite + TypeScript 构建的 UMD 组件库模板，构建产物为单个 `.umd.js` 文件，可直接通过 `<script>` 标签引入任何 HTML 页面或低代码平台，无需打包工具。
 
-- Output a **single `.umd.js` file** with all styles inlined (no separate CSS)
-- Work in plain HTML via `<script>` tag — no bundler required on the consumer side
-- Support **dark mode** out of the box via Tailwind CSS `class` strategy
-- Integrate with platforms like **Kivii Dashboard** through a bridge API
+## 技术栈
 
-### Tech Stack
+| 类别 | 技术 | 版本 |
+|------|------|------|
+| 前端框架 | Vue 3 | 3.4.x |
+| 构建工具 | Vite | 5.x |
+| 类型系统 | TypeScript | 5.x |
+| 样式框架 | Tailwind CSS | 3.4.x |
+| 图表库 | ECharts | 6.x（外部化） |
+| 测试框架 | Vitest + Vue Test Utils | 1.x / 2.4.x |
+| 包管理器 | pnpm | 10.x |
 
-| Tool | Version | Role |
-|------|---------|------|
-| Vue 3 | ^3.4 | Component framework |
-| Vite | ^5.0 | Build tool |
-| TypeScript | ^5.0 | Type safety |
-| Tailwind CSS | ^3.4 | Utility-first styling |
-| ECharts | ^6.0 | Chart rendering (external) |
-| @kivii.com/bridge | ^1.1 | Platform bridge API |
+## 核心特性
 
-### Quick Start
+- **单文件输出**：CSS 自动内联到 UMD JS，部署只需一个文件
+- **样式隔离**：所有 Tailwind 样式加 `.kivii-demo-lib-wrapper` 前缀，不污染宿主页面
+- **外部化依赖**：Vue、ECharts 由宿主页面提供，不打包进产物
+- **组件清单（Manifest）**：每个组件携带名称、版本、描述等元数据，支持低代码平台自动发现
+- **暗黑模式**：基于 Tailwind `class` 策略，支持 `dark:` 变体
+- **HOC 自动包装**：`withWrapper` 高阶组件自动注入隔离容器，无需手动添加
 
-```bash
-# Install dependencies
-pnpm install
+## 构建产物
 
-# Start dev server
-pnpm dev
-
-# Build UMD library
-pnpm build
+```
+dist/
+└── kivii-component-demo-library.umd.js   # 单文件产物，含内联 CSS
 ```
 
-The output is a single file at `dist/kivii-component-demo-library.umd.js`.
-
-### Using the Built Library
+**宿主页面使用方式：**
 
 ```html
-<!-- 1. Load peer dependencies (must be provided by the host page) -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- 前置依赖由宿主提供 -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
 
-<!-- 2. Load the library — styles are auto-injected, no separate CSS needed -->
-<script src="./dist/kivii-component-demo-library.umd.js"></script>
+<!-- 引入组件库 -->
+<script src="./kivii-component-demo-library.umd.js"></script>
 
-<div id="app"></div>
-
-<!-- 3. Mount and use components -->
 <script>
-  const { createApp, ref } = Vue
-  const { install } = window.VueComponent
+  // 全局注册所有组件
+  const app = Vue.createApp({})
+  app.use(window.VueComponent)
 
-  const app = createApp({
-    template: `
-      <theme-switch-test :theme="theme" @toggle-theme="toggle" />
-    `,
-    setup() {
-      const theme = ref('light')
-      const toggle = () => { theme.value = theme.value === 'light' ? 'dark' : 'light' }
-      return { theme, toggle }
-    }
-  })
-
-  app.use(install)   // registers all exported components globally
-  app.mount('#app')
+  // 或单独使用某个组件
+  const { MyComponent } = window.VueComponent
 </script>
 ```
 
-### Adding a New Component
+## 环境要求
 
-1. Create `src/build/components/MyWidget.vue`
-2. Export it in `src/build/components/index.ts`
-3. Register it in `src/build.ts` manifest
+- Node.js `>=18.0.0`
+- pnpm `>=10.x`
 
-See [Development Guide](doc/DEVELOPMENT_GUIDE.md) for full details.
-
-### Project Structure
-
-```
-├── plugins/                  # Local Vite plugins
-│   └── vite-plugin-inline-css.ts
-├── src/
-│   ├── build/                # Library source
-│   │   ├── components/       # Component files
-│   │   ├── types/            # TypeScript types
-│   │   └── build.ts          # Library entry point
-│   └── dev/                  # Dev sandbox (not shipped)
-├── doc/                      # Documentation
-├── dist/                     # Build output
-├── vite.config.ts
-├── tailwind.config.js
-└── package.json
-```
-
-### Key Design Decisions
-
-- **CSS inlined into JS** — `vite-plugin-css-injected-by-js` injects styles at runtime, so consumers import one file only
-- **Tailwind `preflight: false`** — prevents global style reset from leaking into host pages
-- **Vue externalized** — the host page must provide `Vue` globally; keeps bundle size minimal
-- **ECharts externalized** — loaded separately; accessed via `window.echarts` to avoid duplication
-
-### Documentation
-
-| Document | Description |
-|----------|-------------|
-| [Development Guide](doc/DEVELOPMENT_GUIDE.md) | Component development workflow |
-| [Tailwind Isolation Guide](doc/TAILWIND_ISOLATION_GUIDE.md) | Style scoping strategy |
-| [UMD Usage Guide](doc/UMD读取指南.md) | How to consume the UMD bundle |
-| [UI Design Spec](doc/ui-design-spec.md) | Visual design standards |
-| [AI Coding Standards](doc/AI_CODING_STANDARDS.md) | Coding conventions |
-
-### License
-
-[MIT](LICENSE) © 2024 高源
-
----
-
-## 中文说明
-
-### 这是什么？
-
-这是一个 **Vue 3 组件库开发模板**，专为以下场景设计：
-
-- 构建产物为**单个 `.umd.js` 文件**，样式内联其中，无需独立 CSS 文件
-- 支持在**纯 HTML 页面**通过 `<script>` 标签直接引入，无需构建环境
-- 内置 **深色模式**支持（Tailwind CSS `class` 策略）
-- 可与 **Kivii Dashboard** 等低代码平台通过 Bridge API 集成
-
-### 技术栈
-
-| 工具 | 版本 | 用途 |
-|------|------|------|
-| Vue 3 | ^3.4 | 组件框架 |
-| Vite | ^5.0 | 构建工具 |
-| TypeScript | ^5.0 | 类型安全 |
-| Tailwind CSS | ^3.4 | 原子化样式 |
-| ECharts | ^6.0 | 图表渲染（外部依赖） |
-| @kivii.com/bridge | ^1.1 | 平台桥接 API |
-
-### 快速开始
+## 快速开始
 
 ```bash
 # 安装依赖
@@ -156,59 +71,207 @@ pnpm install
 # 启动开发服务器
 pnpm dev
 
-# 构建组件库
+# 构建 UMD 产物
 pnpm build
+
+# 构建（含类型检查）
+pnpm build:check
 ```
 
-构建产物位于 `dist/kivii-component-demo-library.umd.js`。
+## 常用脚本
 
-### 在 HTML 中使用
+| 命令 | 说明 |
+|------|------|
+| `pnpm dev` | 启动开发沙箱（Hot Reload） |
+| `pnpm build` | 构建 UMD 产物 |
+| `pnpm build:check` | 类型检查 + 构建 |
+| `pnpm type-check` | vue-tsc 类型检查 |
+| `pnpm lint` | ESLint 代码检查 |
+| `pnpm lint:fix` | ESLint 自动修复 |
+| `pnpm format` | Prettier 格式化 |
+| `pnpm test` | 单次运行单元测试 |
+| `pnpm test:watch` | Watch 模式单元测试 |
+
+## 测试
+
+使用 **Vitest** + **Vue Test Utils** + **jsdom**，测试文件位于 `tests/` 目录。
+
+```bash
+pnpm test          # 单次运行
+pnpm test:watch    # Watch 模式
+```
+
+测试覆盖组件行为、库 Manifest 完整性、工具函数（防抖、类名转换、Bridge 获取）等。
+
+## 项目结构
+
+```
+src/
+├── build/               # 打包到 UMD 产物的源码
+│   ├── components/      # 业务组件（唯一合法位置）
+│   ├── composables/     # 组合式函数
+│   ├── types/           # TypeScript 类型定义
+│   ├── utils/           # 工具函数（含 getBridge）
+│   └── constants.ts     # 常量（WRAPPER_CLASS_NAME）
+├── dev/                 # 开发沙箱（不打包）
+│   ├── App.vue
+│   └── views/
+└── build.ts             # 库入口（组件注册、Manifest 定义）
+```
+
+## 新增组件
+
+1. 创建 `src/build/components/NewComponent.vue`
+2. 在 `src/build/components/index.ts` 中添加 `export { NewComponent }`
+3. 在 `src/build.ts` 中用 `withWrapper()` 包裹并注册，同步更新 Manifest
+
+## 文档
+
+| 文档 | 说明 |
+|------|------|
+| `doc/DEVELOPMENT_GUIDE.md` | 组件开发工作流 |
+| `doc/TAILWIND_ISOLATION_GUIDE.md` | Tailwind 样式隔离策略详解 |
+| `doc/UMD读取指南.md` | UMD 包集成使用方法 |
+| `doc/ui-design-spec.md` | UI 设计规范 |
+| `rules/CLAUDE.md` | AI 编码规范 |
+
+## 许可证
+
+[MIT License](./LICENSE) © 郁子恒
+
+---
+
+<a id="english"></a>
+
+# Vue 3 UMD Component Library Template
+
+A Vue 3 + Vite + TypeScript component library template that builds to a single `.umd.js` file. Drop it into any HTML page or low-code platform via a `<script>` tag — no bundler required.
+
+## Tech Stack
+
+| Category | Technology | Version |
+|----------|-----------|---------|
+| Framework | Vue 3 | 3.4.x |
+| Build Tool | Vite | 5.x |
+| Type System | TypeScript | 5.x |
+| Styling | Tailwind CSS | 3.4.x |
+| Charts | ECharts | 6.x (externalized) |
+| Testing | Vitest + Vue Test Utils | 1.x / 2.4.x |
+| Package Manager | pnpm | 10.x |
+
+## Key Features
+
+- **Single-file output** — CSS is automatically inlined into the UMD JS; deploy with one file
+- **Style isolation** — All Tailwind styles are scoped under `.kivii-demo-lib-wrapper`, preventing host page pollution
+- **Externalized dependencies** — Vue and ECharts are provided by the host page, not bundled into the output
+- **Component Manifest** — Each component carries metadata (name, version, description) for automatic discovery by low-code platforms
+- **Dark mode** — Tailwind `class`-based strategy with full `dark:` variant support
+- **Auto HOC wrapping** — `withWrapper` HOC injects the isolation container automatically; no manual wrapping needed
+
+## Build Output
+
+```
+dist/
+└── kivii-component-demo-library.umd.js   # Single file with inlined CSS
+```
+
+**Usage in a host page:**
 
 ```html
-<!-- 1. 加载对等依赖（必须由宿主页面提供） -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- Host provides Vue -->
+<script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
 
-<!-- 2. 加载组件库（样式已内联，无需单独 CSS） -->
-<script src="./dist/kivii-component-demo-library.umd.js"></script>
-
-<div id="app"></div>
+<!-- Load the component library -->
+<script src="./kivii-component-demo-library.umd.js"></script>
 
 <script>
-  const { createApp, ref } = Vue
-  const { install } = window.VueComponent
+  // Register all components globally
+  const app = Vue.createApp({})
+  app.use(window.VueComponent)
 
-  const app = createApp({
-    template: `
-      <theme-switch-test :theme="theme" @toggle-theme="toggle" />
-    `,
-    setup() {
-      const theme = ref('light')
-      const toggle = () => { theme.value = theme.value === 'light' ? 'dark' : 'light' }
-      return { theme, toggle }
-    }
-  })
-
-  app.use(install)  // 全局注册所有导出的组件
-  app.mount('#app')
+  // Or use a specific component
+  const { MyComponent } = window.VueComponent
 </script>
 ```
 
-### 新增组件流程
+## Requirements
 
-1. 在 `src/build/components/` 下创建 `MyWidget.vue`
-2. 在 `src/build/components/index.ts` 中导出
-3. 在 `src/build.ts` 的 `manifest` 中补充元数据
+- Node.js `>=18.0.0`
+- pnpm `>=10.x`
 
-详见 [开发指南](doc/DEVELOPMENT_GUIDE.md)。
+## Getting Started
 
-### 设计说明
+```bash
+# Install dependencies
+pnpm install
 
-- **样式内联**：使用 `vite-plugin-css-injected-by-js`，构建时将 CSS 转为 JS 字符串，运行时自动插入 `<style>` 标签
-- **关闭 Tailwind Preflight**：防止全局样式重置污染宿主页面
-- **Vue 外部化**：宿主页面自行提供 Vue，减小包体积
-- **ECharts 外部化**：通过 `window.echarts` 访问，避免重复打包
+# Start development sandbox
+pnpm dev
 
-### 许可证
+# Build UMD output
+pnpm build
 
-[MIT](LICENSE) © 2024 高源
+# Build with type checking
+pnpm build:check
+```
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Start dev sandbox with Hot Reload |
+| `pnpm build` | Build UMD output |
+| `pnpm build:check` | Type-check and build |
+| `pnpm type-check` | vue-tsc type checking |
+| `pnpm lint` | Run ESLint |
+| `pnpm lint:fix` | Auto-fix ESLint issues |
+| `pnpm format` | Prettier formatting |
+| `pnpm test` | Run unit tests once |
+| `pnpm test:watch` | Unit tests in watch mode |
+
+## Testing
+
+Uses **Vitest** + **Vue Test Utils** + **jsdom**. Test files are located in the `tests/` directory.
+
+```bash
+pnpm test          # Single run
+pnpm test:watch    # Watch mode
+```
+
+Tests cover component behavior, library Manifest integrity, and utility functions (debounce, case conversion, Bridge access).
+
+## Project Structure
+
+```
+src/
+├── build/               # Source code compiled into UMD output
+│   ├── components/      # Business components (only valid location)
+│   ├── composables/     # Composition functions
+│   ├── types/           # TypeScript type definitions
+│   ├── utils/           # Utility functions (including getBridge)
+│   └── constants.ts     # Constants (WRAPPER_CLASS_NAME)
+├── dev/                 # Development sandbox (not bundled)
+│   ├── App.vue
+│   └── views/
+└── build.ts             # Library entry (component registration, Manifest)
+```
+
+## Adding a New Component
+
+1. Create `src/build/components/NewComponent.vue`
+2. Export it from `src/build/components/index.ts`
+3. Wrap with `withWrapper()` and register in `src/build.ts`, then update the Manifest
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| `doc/DEVELOPMENT_GUIDE.md` | Component development workflow |
+| `doc/TAILWIND_ISOLATION_GUIDE.md` | Tailwind style isolation strategy |
+| `doc/UMD读取指南.md` | UMD package integration guide |
+| `doc/ui-design-spec.md` | UI design specification |
+| `rules/CLAUDE.md` | AI coding standards |
+
+## License
+
+[MIT License](./LICENSE) © Yu Ziheng
