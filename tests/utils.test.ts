@@ -1,6 +1,14 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { debounce, toPascalCase, getBridge } from '../src/build/utils'
 
+const setMockWindow = (kivii?: unknown) => {
+  Object.defineProperty(globalThis, 'window', {
+    value: { kivii },
+    writable: true,
+    configurable: true,
+  })
+}
+
 describe('debounce', () => {
   afterEach(() => { vi.useRealTimers() })
 
@@ -32,19 +40,18 @@ describe('toPascalCase', () => {
 
 describe('getBridge', () => {
   afterEach(() => {
-    // 还原 window.kivii
-    ;(window as Window & { kivii?: unknown }).kivii = undefined
+    Reflect.deleteProperty(globalThis, 'window')
   })
 
   it('window.kivii 未初始化时返回 null', () => {
-    ;(window as Window & { kivii?: unknown }).kivii = undefined
+    setMockWindow()
     const result = getBridge()
     expect(result).toBeNull()
   })
 
   it('window.kivii 已初始化时返回 bridge 对象', () => {
     const mockBridge = { request: vi.fn() }
-    ;(window as Window & { kivii?: unknown }).kivii = mockBridge
+    setMockWindow(mockBridge)
     const result = getBridge()
     expect(result).toBe(mockBridge)
   })

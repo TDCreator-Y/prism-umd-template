@@ -14,13 +14,9 @@ export type { Props as ThemeSwitchTestProps } from "@/build/components/ThemeSwit
 // 导出组件
 export { ThemeSwitchTest, install };
 
-/**
- * Vue SFC 内部字段类型，兼容 <script setup> 编译产物和 Options API 两种写法
- */
-type WrappableComponent = Component & {
+type NamedComponent = Component & {
   __name?: string;
-  props?: Record<string, unknown>;
-  emits?: string[] | Record<string, unknown>;
+  name?: string;
 };
 
 /**
@@ -33,22 +29,25 @@ type WrappableComponent = Component & {
  * @param component - 要包装的原始 Vue 组件（支持 script setup 和 Options API）
  * @returns 包装后的新 Vue 组件，行为与原组件一致
  */
-const withWrapper = (component: WrappableComponent) =>
-  defineComponent({
+const withWrapper = <T extends Component>(component: T): T => {
+  const namedComponent = component as NamedComponent;
+
+  const wrappedComponent = defineComponent({
     // __name 是 <script setup> 编译产物中的文件名来源，优先使用
-    name: component.__name || (component as Record<string, unknown>).name as string || "WrappedComponent",
+    name: namedComponent.__name || namedComponent.name || "WrappedComponent",
     inheritAttrs: false,
-    props: (component.props ?? {}) as Record<string, unknown>,
-    emits: (component.emits ?? []) as string[],
-    setup(props, { attrs, slots }) {
+    setup(_props, { attrs, slots }) {
       return () =>
         h(
           "div",
           { class: WRAPPER_CLASS_NAME, style: "width:100%;height:100%;" },
-          [h(component as Component, { ...props, ...attrs }, slots)]
+          [h(component, attrs, slots)]
         );
     },
   });
+
+  return wrappedComponent as unknown as T;
+};
 
 const ThemeSwitchTest = withWrapper(_ThemeSwitchTest);
 
