@@ -1,0 +1,62 @@
+{
+	"name": "kivii-component-template",
+	"version": "1.0.0",
+	"description": "组件开发启动模板",
+	"keywords": ["vue3", "umd", "component-library", "tailwind"],
+	"author": "Kivii & Wemt Team",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/kivii/prism-umd-template"
+	},
+	"bugs": {
+		"url": "https://github.com/kivii/prism-umd-template/issues"
+	},
+	"homepage": "https://github.com/kivii/prism-umd-template",
+	"type": "module",
+	"main": "dist/kivii-component-demo-library.umd.js",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"dev": "vite",
+		"build": "vite build",
+		"build:check": "vue-tsc --noEmit && vite build",
+		"preview": "vite preview",
+		"type-check": "vue-tsc --noEmit",
+		"lint": "eslint . --ext .vue,.ts,.tsx",
+		"lint:fix": "eslint . --ext .vue,.ts,.tsx --fix",
+		"format": "prettier --write \"src/**/*.{ts,vue}\"",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"prepublishOnly": "pnpm run build:check"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^5.0.0",
+		"cssnano": "^7.0.0",
+		"@vue/test-utils": "^2.4.0",
+		"autoprefixer": "^10.4.27",
+		"@eslint/js": "^9.0.0",
+		"eslint": "^9.0.0",
+		"eslint-plugin-vue": "^9.0.0",
+		"globals": "^15.0.0",
+		"typescript-eslint": "^8.0.0",
+		"postcss": "^8.5.6",
+		"prettier": "^3.0.0",
+		"tailwindcss": "^3.4.19",
+		"terser": "^5.0.0",
+		"typescript": "^5.0.0",
+		"vite": "^5.0.0",
+		"vitest": "^1.0.0",
+		"vue": "^3.4.0",
+		"vue-tsc": "^2.0.0"
+	},
+	"peerDependencies": {
+		"vue": "^3.0.0"
+	},
+	"dependencies": {
+		"@kivii.com/bridge": "^1.1.11",
+		"echarts": "^6.0.0"
+	},
+	"packageManager": "pnpm@10.28.1+sha1.20817ab95fb7f61154ba5ff3bcb61f27defb6142"
+}

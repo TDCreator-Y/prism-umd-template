@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>加载 UMD 组件库测试</title>
+
+  <!-- 1. 引入图标库 (如果组件库内部用到了 Font Awesome) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- 2. 引入外部依赖库 (由于 vite.config.ts 中将这些依赖 external 化了，宿主必须提供) -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <!-- 如果需要图表组件，也需要引入 echarts -->
+  <script src="https://unpkg.com/echarts@5.5.0/dist/echarts.min.js"></script>
+
+  <!-- 3. 模拟宿主环境提供的全局对象 (对应 globals 配置: '@kivii.com/bridge': 'kivii') -->
+  <script>
+    window.kivii = {
+      // 这里可以模拟 bridge 的方法供组件调用
+      ready: () => console.log('Kivii Bridge Mock Ready')
+    };
+  </script>
+
+  <!-- 4. 引入组件库的 UMD 打包文件 (基于 vite.config.ts 的 fileName) -->
+  <script src="./dist/kivii-component-demo-library.umd.js"></script>
+
+  <!-- 5. 模拟宿主环境的主题色 (CSS 变量) -->
+  <style>
+    :root {
+      /* 对应 kivii-admin 的主色调，组件库会自动读取 */
+      --color-primary: #4e628f;
+      --color-primary-hover: #354265;
+      --color-primary-light: #a3b6de;
+      --color-primary-dark: #2a3451;
+      --color-primary-bg: rgba(78, 98, 143, 0.1);
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f3f4f6;
+      /* 亮色模式页面背景 */
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* 模拟宿主页面的容器 */
+    .host-container {
+      max-width: 56rem;
+      margin: 40px auto;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="host-container">
+    <h2 style="color: #333; margin-bottom: 24px;">在独立 HTML 中加载 UMD 组件库</h2>
+
+    <!-- 6. 使用组件库中导出的组件 (这里以 ThemeSwitchTest 为例) -->
+    <theme-switch-test :theme="currentTheme" @toggle-theme="onToggleTheme"></theme-switch-test>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue;
+    // 获取组件库暴露的全局变量名 (对应 vite.config.ts 中的 lib.name: 'VueComponent')
+    const ComponentLibrary = window.VueComponent;
+
+    const app = createApp({
+      setup () {
+        const currentTheme = ref('light');
+
+        const onToggleTheme = () => {
+          currentTheme.value = currentTheme.value === 'light' ? 'dark' : 'light';
+
+          // 模拟宿主环境切换全局的暗色类名
+          if (currentTheme.value === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.body.style.backgroundColor = '#111827';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.body.style.backgroundColor = '#f3f4f6';
+          }
+        };
+
+        return {
+          currentTheme,
+          onToggleTheme
+        };
+      }
+    });
+
+    // 7. 注册组件库中的所有组件
+    if (ComponentLibrary) {
+      console.log('成功加载 UMD 组件库:', ComponentLibrary);
+
+      // 如果导出了 install 方法则使用 app.use 注册
+      if (typeof ComponentLibrary.install === 'function') {
+        app.use(ComponentLibrary);
+      } else {
+        // 否则手动遍历注册导出的组件
+        Object.keys(ComponentLibrary).forEach(key => {
+          // 排除掉非组件的导出，比如普通的函数或变量
+          if (typeof ComponentLibrary[key] === 'object' && ComponentLibrary[key].setup) {
+            // 组件名驼峰转中划线 (ThemeSwitchTest -> theme-switch-test)
+            const kebabName = key.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+            app.component(kebabName, ComponentLibrary[key]);
+            app.component(key, ComponentLibrary[key]); // 同时注册驼峰名
+          }
+        });
+      }
+    } else {
+      console.error('未找到 VueComponent 全局变量，请确认 UMD 文件是否正确加载。');
+    }
+
+    app.mount('#app');
+  </script>
+</body>
+
+</html>

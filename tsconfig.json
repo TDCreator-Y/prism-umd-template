@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* 打包 */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    /* Vite 负责编译输出，TypeScript 仅做类型检查，noEmit: true 与 emitDeclarationOnly 互斥，
+       此处保留 noEmit 并移除冲突的声明文件生成选项。
+       如需独立生成 .d.ts，请使用单独的 tsconfig.build.json。 */
+    "noEmit": true,
+    "jsx": "preserve",
+
+    /* 代码检查 */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    /* 路径映射 */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "env.d.ts"]
+}

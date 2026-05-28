@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kivii Component 开发预览</title>
+    <!-- 引入 Tailwind CSS，仅在开发环境中使用，不会打包到生产环境 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // 自定义主题色，kivii-admin中已通过tailwind.config.js配置，这里只是为了预览
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                container: {
+                    center: true,
+                },
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f2f5fb',
+                            100: '#e6ecf7',
+                            200: '#c9d5ee',
+                            300: '#a3b6de',
+                            400: '#7a93c9',
+                            500: '#4e628f',
+                            600: '#42527a',
+                            700: '#354265',
+                            800: '#2a3451',
+                            900: '#20283f',
+                            950: '#141a2b',
+                            DEFAULT: '#4e628f',
+                            dark: '#354265',
+                        },
+                    },
+                },
+            }
+        }
+    </script>
+    <!-- 引入 Font Awesome 图标库，仅在开发环境中使用，不会打包到生产环境 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <div id="app"></div>
+    <script type="module" src="/src/dev.ts"></script>
+</body>
+
+</html>
