@@ -18,6 +18,9 @@
 	"files": [
 		"dist"
 	],
+	"sideEffects": [
+		"**/*.css"
+	],
 	"scripts": {
 		"dev": "vite",
 		"build": "vite build",

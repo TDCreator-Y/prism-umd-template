@@ -129,10 +129,10 @@ src/
 
 | 文档 | 说明 |
 |------|------|
-| `doc/DEVELOPMENT_GUIDE.md` | 组件开发工作流 |
-| `doc/TAILWIND_ISOLATION_GUIDE.md` | Tailwind 样式隔离策略详解 |
-| `doc/UMD读取指南.md` | UMD 包集成使用方法 |
-| `doc/ui-design-spec.md` | UI 设计规范 |
+| `docs/DEVELOPMENT_GUIDE.md` | 组件开发工作流 |
+| `docs/TAILWIND_ISOLATION_GUIDE.md` | Tailwind 样式隔离策略详解 |
+| `docs/UMD读取指南.md` | UMD 包集成使用方法 |
+| `docs/ui-design-spec.md` | UI 设计规范 |
 | `rules/CLAUDE.md` | AI 编码规范 |
 
 ## 许可证
@@ -266,10 +266,10 @@ src/
 
 | Document | Description |
 |----------|-------------|
-| `doc/DEVELOPMENT_GUIDE.md` | Component development workflow |
-| `doc/TAILWIND_ISOLATION_GUIDE.md` | Tailwind style isolation strategy |
-| `doc/UMD读取指南.md` | UMD package integration guide |
-| `doc/ui-design-spec.md` | UI design specification |
+| `docs/DEVELOPMENT_GUIDE.md` | Component development workflow |
+| `docs/TAILWIND_ISOLATION_GUIDE.md` | Tailwind style isolation strategy |
+| `docs/UMD读取指南.md` | UMD package integration guide |
+| `docs/ui-design-spec.md` | UI design specification |
 | `rules/CLAUDE.md` | AI coding standards |
 
 ## License

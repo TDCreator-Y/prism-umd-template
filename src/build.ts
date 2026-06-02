@@ -7,6 +7,7 @@ import type { LibraryManifest } from "@/build/types";
 import { h, defineComponent } from "vue";
 import { ThemeSwitchTest as _ThemeSwitchTest } from "@/build/components";
 import { WRAPPER_CLASS_NAME } from "@/build/constants";
+import { LIB_NAME, LIB_FILE_NAME } from "@/build/lib.config";
 
 // 组件类型定义（只有需要传递参数的组件才需要定义类型）
 export type { Props as ThemeSwitchTestProps } from "@/build/components/ThemeSwitchTest.vue";
@@ -67,9 +68,9 @@ const install = (app: App) => {
 };
 
 export const manifest: LibraryManifest = {
-  libName: "VueComponent",
+  libName: LIB_NAME,
   format: "umd",
-  fileName: "kivii-component-demo-library.umd.js",
+  fileName: LIB_FILE_NAME,
   zhName: "组件库 UMD 包",
   author: "Kivii & Wemt Team",
   version: "1.0.0",

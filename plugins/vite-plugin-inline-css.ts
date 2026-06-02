@@ -33,10 +33,18 @@ function findUmdInsertIndex(jsContent: string): number {
  * 注入代码在 IIFE 中动态创建 <style> 标签，对 SSR 环境安全（检测 document）。
  */
 export function inlineCss(): Plugin {
+  // 默认回退到 cwd/dist；configResolved 时替换为 Vite 实际解析出的 outDir，
+  // 避免使用方自定义 build.outDir 后插件找不到产物。
+  let resolvedOutDir = resolve(process.cwd(), 'dist');
+
   return {
     name: 'inline-css',
+    configResolved(config) {
+      // outDir 可能是绝对路径（resolve 会忽略 root）或相对 root 的路径
+      resolvedOutDir = resolve(config.root, config.build.outDir);
+    },
     closeBundle() {
-      const outDir = resolve(process.cwd(), 'dist');
+      const outDir = resolvedOutDir;
       const cssFile = resolve(outDir, 'style.css');
 
       if (!existsSync(cssFile)) {

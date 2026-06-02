@@ -44,4 +44,22 @@ export default tseslint.config(
       'no-console': 'off',
     },
   },
+
+  // 构建脚本与配置文件运行在 Node 环境（postcss/tailwind/eslint/vite 配置等）
+  {
+    files: ['**/*.{js,cjs,mjs}', '*.config.ts'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+
+  // CommonJS 脚本允许 require 风格导入
+  {
+    files: ['**/*.cjs'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
 )
